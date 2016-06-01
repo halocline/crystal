@@ -1,0 +1,537 @@
+<head>
+  <title>crystal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>-->
+  <script type="text/javascript" src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="http://mottie.github.io/tablesorter/dist/js/jquery.tablesorter.min.js"></script>
+	<script src="https://api.trello.com/1/client.js?key=892a3fb723fb5d0d42ec32c96c447eb9"></script>
+	<!--<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>-->
+</head>
+
+<body>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+      	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        	<span class="sr-only">Toggle navigation</span>
+        	<span class="icon-bar"></span>
+        	<span class="icon-bar"></span>
+        	<span class="icon-bar"></span>
+      	</button>
+      	<a class="navbar-brand" href="{{pathFor 'home'}}">Market Intel Roadmap</a>
+    	</div>
+    	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class=""><a href="{{pathFor 'queue'}}">Active Queue</a></li>
+        <li class=""><a href="{{pathFor 'othercards'}}">Backlog</a></li>
+        <li class=""><a href="{{pathFor 'parkinglot'}}">Parking Lot</a></li>
+        <li class=""><a href="{{pathFor 'keyquestions'}}">Key Questions</a></li>
+        <li class=""><a href="{{pathFor 'completed'}}">Completed</a></li>
+        <li class=""><a href="{{pathFor 'stats'}}">Stats</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+		</div><!-- /.container-fluid -->
+	</nav>
+	<header>
+		<div class="container-fluid">
+		</div>
+	</header>
+	<div class="container-fluid">
+	</div><!-- /.container-fluid -->
+</body>
+
+<template name="home">
+</template>
+
+<template name="boardname">
+	{{boardname.name}}
+</template>
+
+<!--
+<template name="queue">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				{{> cards}}
+			</div>
+		</div>
+	</div>
+</template>
+-->
+
+<template name="queue">
+	<div class="container-fluid card">
+		<div class="row">
+			<div class="col-md-12">
+				<h3>Active Queue</h3>
+				<div class="row">
+					<div class="col-xs-1">
+						<div class="table-sort" >
+							<span class="glyphicon glyphicon-sort small" aria-hidden="true"></span>
+						</div>
+					</div>
+				</div><!-- /.row -->
+				<table class="table table-striped table-hover small tablesorter">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Project</th>
+							<th>2016 Marketing<br>Objective</th>
+							<th>Strategic<br>Objective</th>
+							<!--<th>Success Measure</th>-->
+							<th>Impact</th>
+							<th>Scope</th>
+							<th>Team</th>
+							<th>Stakeholder</th>
+							<!--<th>Added</th>-->
+							<th>Status</th>
+							<th>Due</th>
+							<th hidden>Closed</th>
+							<th>Assigned</th>
+							<th hidden>Priority</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each queue_card}}
+							<tr>
+								<td>{{getPriority labels}}</td>
+								<td>
+									<a href="{{url}}" target="false" class="card-name">{{name}}</a>
+								</td>
+								<td>
+									{{getMarketingObjective labels}}
+								</td>
+								<td>{{getStrategicObjective labels}}</td>
+								<!--<td>{{getSuccessMeasure labels}}</td>-->
+								<td>{{getImpact labels}}</td>
+								<td>{{getScope labels}}</td>
+								<td>{{getTeam labels}}</td>
+								<td>{{getStakeholder labels}}</td>
+								<!--<td>{{getDateAdded id}}</td>-->
+								<td>{{getListName idList}}</td>
+								<td>{{formatDate due}}</td>
+								<td hidden>{{closed}}</td>
+								<td>{{getMemberName idMembers}}</td>
+								<td hidden>{{pos}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div><!-- /.col-md-12 -->
+		</div><!-- /.row -->
+	</div><!-- /.container-fluid card -->
+</template>
+
+<template name="completed">
+	<div class="container-fluid card">
+		<div class="row">
+			<div class="col-md-12">
+				<h3>Completed</h3>
+				<div class="row">
+					<div class="col-xs-1">
+						<div class="table-sort" >
+							<span class="glyphicon glyphicon-sort small" aria-hidden="true"></span>
+						</div>
+					</div>
+				</div><!-- /.row -->
+				<table class="table table-striped table-hover small tablesorter">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Project</th>
+							<th>2016 Marketing<br>Objective</th>
+							<th>Strategic<br>Objective</th>
+							<!--<th>Success Measure</th>-->
+							<th>Team</th>
+							<th>Stakeholder</th>
+							<!--<th>Added</th>-->
+							<th>Status</th>
+							<th>Due</th>
+							<th hidden>Closed</th>
+							<th>Assigned</th>
+							<th hidden>Priority</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each completed_cards}}
+							<tr>
+								<td>{{getPriority labels}}</td>
+								<td>
+									<a href="{{url}}" target="false" class="card-name">{{name}}</a>
+								</td>
+								<td>
+									{{getMarketingObjective labels}}
+								</td>
+								<td>{{getStrategicObjective labels}}</td>
+								<!--<td>{{getSuccessMeasure labels}}</td>-->
+								<td>{{getTeam labels}}</td>
+								<td>{{getStakeholder labels}}</td>
+								<!--<td>{{getDateAdded id}}</td>-->
+								<td>{{getListName idList}}</td>
+								<td>{{formatDate due}}</td>
+								<td hidden>{{closed}}</td>
+								<td>{{getMemberName idMembers}}</td>
+								<td hidden>{{pos}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div><!-- /.col-md-12 -->
+		</div><!-- /.row -->
+	</div>
+</template>
+
+<template name="stats">
+	<div class="container-fluid"></div>
+</template>
+
+<template name="cards">
+	<div class="container-fluid card">
+		<div class="row">
+			<div class="col-md-12">
+				<h3>Channel Mix Optimization</h3>
+				<table class="table table-striped table-hover small tablesorter">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>2016 Marketing Objective</th>
+							<th>Success Measure</th>
+							<th>Stage</th>
+							<th>Stakeholder</th>
+							<th>Added</th>
+							<th>Due</th>
+							<th>Closed</th>
+							<th>Assigned</th>
+							<th hidden>Priority</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each portfolio_card}}
+							<tr>
+								<td>{{getPriority labels}}</td>
+								<td>
+									<a href="{{url}}" target="false" class="card-name">{{name}}</a>
+								</td>
+								<td>{{getStrategicObjective labels}}</td>
+								<td>{{getSuccessMeasure labels}}</td>
+								<td>{{getListName idList}}</td>
+								<td>{{getStakeholder labels}}</td>
+								<td>{{getDateAdded id}}</td>
+								<td>{{formatDate due}}</td>
+								<td>{{closed}}</td>
+								<td>{{getMemberName idMembers}}</td>
+								<td hidden>{{pos}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div><!-- /.col-md-12 -->
+		</div><!-- /.row -->
+	</div><!-- /.container -->
+	<div class="container-fluid card">
+		<div class="row">
+			<div class="col-md-12">
+				<h3>Channel Optimization</h3>
+				<table class="table table-striped table-hover small tablesorter">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>2016 Marketing Objective</th>
+							<th>Success Measure</th>
+							<th>Stage</th>
+							<th>Stakeholder</th>
+							<th>Added</th>
+							<th>Due</th>
+							<th>Closed</th>
+							<th>Assigned</th>
+							<th hidden>Priority</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each channel_card}}
+							<tr>
+								<td>{{getPriority labels}}</td>
+								<td>
+									<a href="{{url}}" target="false" class="card-name">{{name}}</a>
+								</td>
+								<td>{{getStrategicObjective labels}}</td>
+								<td>{{getSuccessMeasure labels}}</td>
+								<td>{{getListName idList}}</td>
+								<td>{{getStakeholder labels}}</td>
+								<td>{{getDateAdded id}}</td>
+								<td>{{formatDate due}}</td>
+								<td>{{closed}}</td>
+								<td>{{getMemberName idMembers}}</td>
+								<td hidden>{{pos}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div><!-- /.col-md-12 -->
+		</div><!-- /.row -->
+	</div><!-- /.container -->
+	<div class="container-fluid card">
+		<div class="row">
+			<div class="col-md-12">
+				<h3>Increase Lifetime Value</h3>
+				<table class="table table-striped table-hover small tablesorter">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>2016 Marketing Objective</th>
+							<th>Success Measure</th>
+							<th>Stage</th>
+							<th>Stakeholder</th>
+							<th>Added</th>
+							<th>Due</th>
+							<th>Closed</th>
+							<th>Assigned</th>
+							<th hidden>Priority</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each ltv_card}}
+							<tr>
+								<td>{{getPriority labels}}</td>
+								<td>
+									<a href="{{url}}" target="false" class="card-name">{{name}}</a>
+								</td>
+								<td>{{getStrategicObjective labels}}</td>
+								<td>{{getSuccessMeasure labels}}</td>
+								<td>{{getListName idList}}</td>
+								<td>{{getStakeholder labels}}</td>
+								<td>{{getDateAdded id}}</td>
+								<td>{{formatDate due}}</td>
+								<td>{{closed}}</td>
+								<td>{{getMemberName idMembers}}</td>
+								<td hidden>{{pos}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div><!-- /.col-md-12 -->
+		</div><!-- /.row -->
+	</div><!-- /.container -->
+	<div class="container-fluid card">
+		<div class="row">
+			<div class="col-md-12">
+				<h3>Deep Understanding of Audience</h3>
+				<table class="table table-striped table-hover small tablesorter">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>2016 Marketing Objective</th>
+							<th>Success Measure</th>
+							<th>Stage</th>
+							<th>Stakeholder</th>
+							<th>Added</th>
+							<th>Due</th>
+							<th>Closed</th>
+							<th>Assigned</th>
+							<th hidden>Priority</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each audience_card}}
+							<tr>
+								<td>{{getPriority labels}}</td>
+								<td>
+									<a href="{{url}}" target="false" class="card-name">{{name}}</a>
+								</td>
+								<td>{{getStrategicObjective labels}}</td>
+								<td>{{getSuccessMeasure labels}}</td>
+								<td>{{getListName idList}}</td>
+								<td>{{getStakeholder labels}}</td>
+								<td>{{getDateAdded id}}</td>
+								<td>{{formatDate due}}</td>
+								<td>{{closed}}</td>
+								<td>{{getMemberName idMembers}}</td>
+								<td hidden>{{pos}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div><!-- /.col-md-12 -->
+		</div><!-- /.row -->
+	</div><!-- /.container-fluid card -->
+</template>
+
+<template name="parkinglot">
+	<div class="container-fluid card">
+		<div class="row">
+			<div class="col-md-12">
+				<h3>Parking Lot</h3>
+				<table class="table table-striped table-hover small tablesorter">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>2016 Marketing Objective</th>
+							<th>Success Measure</th>
+							<th>Stage</th>
+							<th>Stakeholder</th>
+							<th>Added</th>
+							<th>Due</th>
+							<th>Closed</th>
+							<th>Assigned</th>
+							<th hidden>Priority</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each parkinglot_card}}
+							<tr>
+								<td>{{getPriority labels}}</td>
+								<td>
+									<a href="{{url}}" target="false" class="card-name">{{name}}</a>
+								</td>
+								<td>{{getStrategicObjective labels}}</td>
+								<td>{{getSuccessMeasure labels}}</td>
+								<td>{{getListName idList}}</td>
+								<td>{{getStakeholder labels}}</td>
+								<td>{{getDateAdded id}}</td>
+								<td>{{formatDate due}}</td>
+								<td>{{closed}}</td>
+								<td>{{getMemberName idMembers}}</td>
+								<td hidden>{{pos}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div><!-- /.col-md-12 -->
+		</div><!-- /.row -->
+	</div><!-- /.container-fluid card -->
+</template>
+
+<template name="keyquestions">
+	<div class="container-fluid card">
+		<div class="row">
+			<div class="col-md-12">
+				<h3>Key Questions</h3>
+				<div class="row">
+					<div class="col-xs-1">
+						<div class="table-sort" >
+							<span class="glyphicon glyphicon-sort small" aria-hidden="true"></span>
+						</div>
+					</div>
+				</div><!-- /.row -->
+				<table class="table table-striped table-hover small tablesorter">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>2016 Marketing Objective</th>
+							<th>Success Measure</th>
+							<th>Stage</th>
+							<th>Stakeholder</th>
+							<th>Added</th>
+							<th>Due</th>
+							<th>Closed</th>
+							<th>Assigned</th>
+							<th hidden>Priority</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each keyquestion_card}}
+							<tr>
+								<td>{{getPriority labels}}</td>
+								<td>
+									<a href="{{url}}" target="false" class="card-name">{{name}}</a>
+								</td>
+								<td>{{getStrategicObjective labels}}</td>
+								<td>{{getSuccessMeasure labels}}</td>
+								<td>{{getListName idList}}</td>
+								<td>{{getStakeholder labels}}</td>
+								<td>{{getDateAdded id}}</td>
+								<td>{{formatDate due}}</td>
+								<td>{{closed}}</td>
+								<td>{{getMemberName idMembers}}</td>
+								<td hidden>{{pos}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div><!-- /.col-md-12 -->
+		</div><!-- /.row -->
+	</div><!-- /.container-fluid card -->
+</template>
+
+<template name="othercards">
+	<div class="container-fluid card">
+		<div class="row">
+			<div class="col-md-12">
+				<h3>Backlog & Other Requests</h3>
+				<div class="row">
+					<div class="col-xs-1">
+						<div class="table-sort" >
+							<span class="glyphicon glyphicon-sort small" aria-hidden="true"></span>
+						</div>
+					</div>
+					<div class="col-sm-3">
+						<form class="form-inline">
+							<div class="form-group">
+								<select class="form-control stakeholder">
+										<option>All</option>
+									{{#each stakeholder}}
+										<option value="{{id}}">{{name}}</option>
+									{{/each}}
+								</select>
+							</div>
+						</form>
+					</div>
+				</div><!-- /.row -->
+				<table class="table table-striped table-hover small tablesorter">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Project</th>
+							<th>2016 Marketing<br>Objective</th>
+							<th>Strategic<br>Objective</th>
+							<!--<th>Success Measure</th>-->
+							<th>Impact</th>
+							<th>Scope</th>
+							<th>Team</th>
+							<th>Stakeholder</th>
+							<!--<th>Added</th>-->
+							<th>Status</th>
+							<th>Due</th>
+							<th hidden>Closed</th>
+							<th>Assigned</th>
+							<th hidden>Priority</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each other_card}}
+							<tr>
+								<td>{{getPriority labels}}</td>
+								<td>
+									<a href="{{url}}" target="false" class="card-name">{{name}}</a>
+								</td>
+								<td>
+									{{getMarketingObjective labels}}
+								</td>
+								<td>{{getStrategicObjective labels}}</td>
+								<!--<td>{{getSuccessMeasure labels}}</td>-->
+								<td>{{getImpact labels}}</td>
+								<td>{{getScope labels}}</td>
+								<td>{{getTeam labels}}</td>
+								<td>{{getStakeholder labels}}</td>
+								<!--<td>{{getDateAdded id}}</td>-->
+								<td>{{getListName idList}}</td>
+								<td>{{formatDate due}}</td>
+								<td hidden>{{closed}}</td>
+								<td>{{getMemberName idMembers}}</td>
+								<td hidden>{{pos}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div><!-- /.col-md-12 -->
+		</div><!-- /.row -->
+	</div><!-- /.container-fluid card -->
+</template>
+
+

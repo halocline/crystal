@@ -1,0 +1,256 @@
+
+// Trello authentication functions
+var authenticationSuccess = function() { console.log("Successful authentication"); };
+var authenticationFailure = function() { console.log("Failed authentication"); };
+
+// Trello board configuration
+//var boardId = "53e4ed33c5473721937ffe15";
+
+// Client
+if (Meteor.isClient) {
+  //
+  Session.set('connectaReady', false);
+
+  Meteor.startup(function () {
+    $.getScript(
+      'https://api.trello.com/1/client.js?key=892a3fb723fb5d0d42ec32c96c447eb9',
+      function(){
+        Session.set('conectaReady', true);
+      }
+    );
+    Meteor.call('authorizeTrello');
+    Trello.get(
+      "/members/me/organizations",
+      function (data) {
+        Session.set('organizations', data);
+      }
+    );
+    Trello.get(
+      "/members/me/boards",
+      function (data) {
+        Session.set('boards', data);
+      }
+    );
+  });
+
+  Session.setDefault('boardSelected', {id: "53e4ed33c5473721937ffe15"});
+
+  Session.setDefault('actionsSince', "null");
+  Session.setDefault('actionsBefore', new Date);
+
+  Template.trello.helpers({});
+
+  Template.trello.events({
+    'click #trConnect': function () {
+      console.log('action: connect to Trello');
+    },
+    'click #trCreateCard': function () {
+      console.log('action: create card');
+      Meteor.call('createCard', "5674889a3876a359e0920792");
+    },
+    'click #trShowCards': function () {
+      Meteor.call('getAllCards', boardId);
+    }
+  });
+
+  Template.organizations.helpers({
+    organizations: function () {
+      return Session.get('organizations');
+    }
+  });
+
+  Template.organizations.events({
+    'change #org': function () {
+      var organizationId = $('#org option:selected').val();
+      var success = function (data) {
+        Session.set('boards', data);
+      }
+      Meteor.call('authorizeTrello');
+      if ( organizationId === 'all' ) {
+        Session.set('organizationSelected', {id: 'None Selected'});
+        Trello.get("/members/me/boards", success);
+      }
+      else {
+        Trello.get(
+          "/organizations/" + organizationId,
+          function (data) {
+            Session.set('organizationSelected', data);
+          }
+        );
+        Trello.get("/organizations/" + organizationId + "/boards", success);
+      }
+    }
+  });
+
+  Template.boards.helpers({
+    boards: function () {
+      return Session.get('boards');
+    }
+  });
+
+  Template.boards.events({
+    'change #board': function () {
+      var boardId = $('#board option:selected').val();
+      var success = function (data) {
+        Session.set('boardSelected', data);
+      }; 
+      Meteor.call('authorizeTrello');
+      if ( boardId === 'all') {
+        Session.set('boardSelected', {id: 'None Selected'});
+      }
+      else {
+        Trello.get("boards/" + boardId, success);
+      }
+    }
+  });
+
+  Template.cards.helpers({
+    cards: function () {
+      var success = function (data) {
+        Session.set('cards', data);
+      };
+      Meteor.call('authorizeTrello');
+      if ( Session.get('boardSelected').id === 'None Selected' ) {
+        if ( Session.get('organizationSelected').id === 'None Selected' ) {
+          Trello.get('/members/me/boards', success);
+        }
+        else {
+          Trello.get(
+            "/organizations/" + Session.get('organizationSelected').id + "/boards",
+            success
+          );
+        }
+      }
+      else {
+        Trello.get("/boards/" + Session.get('boardSelected').id + "/cards",
+          success
+        );
+      }
+      return Session.get('cards');
+    },
+    list: function () {
+      var idList = $('td.idList').val();
+      var success = function (data) {
+        console.log(idList);
+      };
+      Meteor.call('authorizeTrello');
+      Trello.get('/lists/' + idList, success); 
+    }
+  });
+
+  Template.cards.events({
+    'click .card-name': function () {
+      var success = function (data) {
+        Session.set('actions', data);
+      }
+      Meteor.call('authorizeTrello');
+      Trello.get('/cards/' + this.id + '/actions', success);
+    }
+  });
+
+  Template.labels.helpers({
+    labels: function () {
+      var success = function (data) {
+        Session.set('labels', data);
+      };
+      Meteor.call('authorizeTrello');
+      Trello.get("/boards/" + Session.get('boardSelected').id + "/labels",
+        success
+      );
+      return Session.get('labels');
+    }
+  });
+
+  Template.labels.events({
+    'change #client': function () {
+      var labelId;
+      labelId= $('#client option:selected').val();
+    }
+  });
+
+  Template.progress.helpers({
+    actions: function () {
+      var sinceDate = Session.get('actionsSince');
+      var beforeDate = Session.get('actionsBefore');
+      var filter = "?" + "since=" + sinceDate + "&" + "before=" + beforeDate;
+      var success = function (data) {
+        Session.set('actions', data);
+      };
+      Meteor.call('authorizeTrello');
+      Trello.get(
+        "/boards/" + Session.get('boardSelected').id + "/actions" + filter,
+        success
+      );
+      //console.log( Session.get('actions') );
+      return Session.get('actions');
+    }
+  });
+
+  Template.progress.events({
+    'change #beginDate': function () {
+      var date = $('#beginDate').val();
+      Session.set('actionsSince', date);
+    },
+    'change #endDate': function () {
+      var date = $('#endDate').val();
+      Session.set('actionsBefore', date);
+    }
+  });
+
+  $.getScript(
+    'http://d3js.org/d3.v3.min.js',
+    function(){
+      var data = function () {
+        //return Session.get('actions');
+        return [10, 25, 37, 50, 23, 32, 67];
+      };
+      d3.select(".chart")
+        .selectAll("div")
+          .data(data)
+        .enter().append("div")
+          .style("width", function(d) { return d * 10 + "px"; })
+          .text(function(d) { return d; });
+    }
+  );
+}
+
+
+// Server
+if (Meteor.isServer) {
+  Meteor.startup(function () {
+    // code to run on server at startup
+  });
+}
+
+
+// Methods
+Meteor.methods({
+  authorizeTrello: function () {
+    Trello.authorize({
+        type: "popup",
+        name: "Getting Started Application2",
+        scope: {
+          read: true,
+          write: true },
+        expiration: "never",
+        authenticationSuccess,
+        authenticationFailure
+      });
+  },
+  createCard: function (idList) {
+    var myList = idList;
+    var creationSuccess = function(data) {
+      console.log("Card created successfully. Data returned:" + JSON.stringify(data));
+    };
+    var newCard = {
+      name: "Another Test Card",
+      desc: "This is the description of our new card.",
+      pos: "top", // Place this card at the top of our list
+      idList: myList
+    };
+    console.log('posting card to Trello');
+    Trello.post("/cards", newCard, creationSuccess);
+  }
+});
+
+

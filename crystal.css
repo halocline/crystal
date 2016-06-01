@@ -1,0 +1,35 @@
+/* CSS declarations go here */
+
+
+.chart div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+
+body {
+	padding-top: 60px;
+	padding-bottom: 60px;
+	background-color: #DEDBD2;
+}
+
+.card {
+	margin: 40px 40px 40px 0px;
+	padding: 0px 20px 10px 20px;
+
+	border-radius: 2px 2px 2px 2px;
+	-moz-border-radius: 2px 2px 2px 2px;
+	-webkit-border-radius: 2px 2px 2px 2px;
+	border: 0px solid #000000;
+
+	-webkit-box-shadow: 1px 1px 1px 1px #888;
+	-moz-box-shadow: 1px 1px 1px 1px #888;
+	box-shadow: 1px 1px 1px 1px #888;
+
+	background-color: #ffffff;
+}
+
+
